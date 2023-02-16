@@ -1,7 +1,25 @@
-// Write a programme to impact the balances of the given accounts, based on their transactions.
-// Print the final balance for all the accounts with account number, name and balance amount.
+const { peek } = require('@laufire/utils/debug');
 
-/* Input */
+const doTransactions = ({ balances, transactions }) => {
+	const currentBalances = { ...balances };
+
+	transactions.map(({ type, accountNo, amount }) => {
+		type === 'withdrawal'
+			? currentBalances[accountNo] -= amount
+			: currentBalances[accountNo] += amount;
+	});
+	return currentBalances;
+};
+
+const addBalToAccounts = ({ balances, accounts }) =>
+	accounts.map((account) =>
+		({ ...account, balance: balances[account.accountNo] }));
+
+const displayBalances = (balance) => {
+	// eslint-disable-next-line no-console
+	console.table(balance);
+};
+
 const accounts = [
 	{
 		name: 'Aron',
@@ -53,36 +71,20 @@ const transactions = [
 		amount: 200,
 	},
 ];
-// eslint-disable-next-line no-shadow
-const updateBalances = (balances, transactions) => {
-	transactions.map((transaction) => {
-		transaction.type === 'withdrawal'
-			? balances[transaction.accountNo] -= transaction.amount
-			: balances[transaction.accountNo] += transaction.amount;
-	});
-	return balances;
-};
-
-// eslint-disable-next-line no-shadow
-const updateAccounts = (balances, accounts) => accounts.map((account) =>
-	({ ...account, balance: balances[account.accountNo] }));
-
-const displayBalances = (balance) => {
-	// eslint-disable-next-line no-console
-	console.table(balance);
-};
-
 const main = () => {
-	// eslint-disable-next-line no-console
-	console.log('Balances before transactions');
-	const oldAccBalances = updateAccounts(balances, accounts);
+	peek('Balances before transactions');
+	const oldAccBalances = addBalToAccounts({ balances, accounts });
 
 	displayBalances(oldAccBalances);
-	const updatedBalances = updateBalances(balances, transactions);
+	const updatedBalances = doTransactions({ balances, transactions });
 
-	// eslint-disable-next-line no-console
-	console.log('Balances after transactions');
-	const newAccBalances = updateAccounts(updatedBalances, accounts);
+	peek('Balances after transactions');
+	const newAccBalances = addBalToAccounts({
+		balances: updatedBalances,
+		accounts: accounts,
+	});
+
+	peek(balances);
 
 	displayBalances(newAccBalances);
 };
