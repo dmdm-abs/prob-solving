@@ -1,24 +1,24 @@
 const { peek } = require('@laufire/utils/debug');
 
-const calcDistance = ({ distances, acc, value, route }) =>
-	// eslint-disable-next-line complexity
-	distances.map(({ start, end, distance }) => {
-		((start === acc && end === value)
-			|| (start === value && end === acc))
-			&& (route.distance += distance);
-	});
+const getLegDistance = ({ value, distances }) =>
+	distances.find((distance) =>
+		(distance.start === value.from && distance.end === value.to)
+			|| (distance.end === value.from && distance.start === value.to))
+		?.distance;
 
-const updateRoutes = ({ distances, routes }) =>
+const getTotalDistance = ({ legs, distances }) =>
+	legs.reduce((acc, value) => acc + getLegDistance({ value, distances }), 0);
+
+const findLegs = (route) =>
+	route.stops.map((stop, index) =>
+		({ from: stop, to: route.stops[index + 1] })).slice(0, -1);
+
+const calcDistances = ({ distances, routes }) =>
 	routes.map((route) => {
-		route.stops.reduce((acc, value) => {
-			acc === value
-				? route.distance = 0
-				: calcDistance({ distances, acc, value, route });
-			return value;
-		}, route.start);
-		return route;
-	});
+		const legs = findLegs(route);
 
+		return { ...route, distance: getTotalDistance({ legs, distances }) };
+	});
 const display = (routes) => {
 	peek(routes);
 };
@@ -74,7 +74,7 @@ const routes = [
 ];
 
 const main = () => {
-	display(updateRoutes({ distances, routes }));
+	display(calcDistances({ distances, routes }));
 };
 
 main();
