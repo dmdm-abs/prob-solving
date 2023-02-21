@@ -1,24 +1,22 @@
 const { peek } = require('@laufire/utils/debug');
 
-const getLegDistance = ({ value, distances }) =>
-	distances.find((distance) =>
-		(distance.start === value.from && distance.end === value.to)
-			|| (distance.end === value.from && distance.start === value.to))
+const getLegDistance = ({ leg: { from, to }, distances }) =>
+	distances.find(({ start, end }) =>
+		(start === from && end === to) || (start === to && end === from))
 		?.distance;
 
-const getTotalDistance = ({ legs, distances }) =>
-	legs.reduce((acc, value) => acc + getLegDistance({ value, distances }), 0);
+const findLegs = ({ stops }) =>
+	stops.map((stop, index) =>
+		({ from: stop, to: stops[index + 1] })).slice(0, -1);
 
-const findLegs = (route) =>
-	route.stops.map((stop, index) =>
-		({ from: stop, to: route.stops[index + 1] })).slice(0, -1);
+const getDistance = ({ route, distances }) =>
+	findLegs(route).reduce((acc, leg) =>
+		acc + getLegDistance({ leg, distances }), 0);
 
 const calcDistances = ({ distances, routes }) =>
-	routes.map((route) => {
-		const legs = findLegs(route);
+	routes.map((route) =>
+		({ ...route, distance: getDistance({ route, distances }) }));
 
-		return { ...route, distance: getTotalDistance({ legs, distances }) };
-	});
 const display = (routes) => {
 	peek(routes);
 };
