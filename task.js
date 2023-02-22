@@ -1,16 +1,15 @@
 const { peek, pretty } = require('@laufire/utils/debug');
 
-const getTotalCost = (tasks, cost) => tasks.reduce((total, subTask) =>
-	total + subTask.totalCost, cost);
+const getTotalCost = (total, subTask) => total + subTask.totalCost;
 
 // eslint-disable-next-line no-use-before-define
 const calcSubTask = (subTask) => calcTask(subTask);
 
-const calcTask = ({ cost = 0, tasks: subTasks = [], ...task }) => {
+const calcTask = ({ cost = 0, tasks: subTasks = [], ...rest }) => {
 	const tasks = subTasks.map(calcSubTask);
-	const totalCost = getTotalCost(tasks, cost);
+	const totalCost = tasks.reduce(getTotalCost, cost);
 
-	return { cost, ...task, tasks, totalCost };
+	return { cost, ...rest, tasks, totalCost };
 };
 
 const display = (data) => {
