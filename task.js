@@ -1,4 +1,5 @@
 const { peek, pretty } = require('@laufire/utils/debug');
+const { map, reduce } = require('@laufire/utils/collection');
 
 const getTotalCost = (total, subTask) => total + subTask.totalCost;
 
@@ -6,8 +7,10 @@ const getTotalCost = (total, subTask) => total + subTask.totalCost;
 const calcSubTask = (subTask) => calcTask(subTask);
 
 const calcTask = ({ cost = 0, tasks: subTasks = [], ...rest }) => {
-	const tasks = subTasks.map(calcSubTask);
-	const totalCost = tasks.reduce(getTotalCost, cost);
+	const tasks = map(subTasks, calcSubTask);
+	const totalCost = reduce(
+		tasks, getTotalCost, cost,
+	);
 
 	return { cost, ...rest, tasks, totalCost };
 };

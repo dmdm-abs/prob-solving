@@ -1,18 +1,20 @@
 const { peek } = require('@laufire/utils/debug');
+const { map } = require('@laufire/utils/collection');
 
 const doTransactions = ({ balances, transactions }) => {
 	const currentBalances = { ...balances };
 
-	transactions.map(({ type, accountNo, amount }) => {
+	map(transactions, ({ type, accountNo, amount }) => {
 		type === 'withdrawal'
 			? currentBalances[accountNo] -= amount
 			: currentBalances[accountNo] += amount;
 	});
+
 	return currentBalances;
 };
 
 const addBalToAccounts = ({ balances, accounts }) =>
-	accounts.map((account) =>
+	map(accounts, (account) =>
 		({ ...account, balance: balances[account.accountNo] }));
 
 const displayBalances = (balance) => {
@@ -83,8 +85,6 @@ const main = () => {
 		balances: updatedBalances,
 		accounts: accounts,
 	});
-
-	peek(balances);
 
 	displayBalances(newAccBalances);
 };
