@@ -9,7 +9,7 @@ const operations = {
 };
 
 const display = (data) => {
-	peek(data);
+	peek(data, 'data');
 };
 
 const funcName = process.argv[2];
