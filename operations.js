@@ -5,7 +5,13 @@ const operation = {
 	div: ([operandOne, operandTwo]) => operandOne / operandTwo,
 };
 
-const operations = (operator, ...data) =>
-	operation[operator](data);
+const operations = (operator, ...data) => {
+	try {
+		return operation[operator](data);
+	}
+	catch (error) {
+		return error;
+	}
+};
 
 module.exports = operations;
